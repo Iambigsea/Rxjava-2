@@ -34,7 +34,7 @@ RxJava map操作
 
 这里是把OnSubscribe里面的字符串"llalala","asdfasda"的hashcode值打印出来，就是把new Observable.OnSubscribe<String>()里面的String，</br>
 转为subscribe(new Subscriber<Integer>()里面的integer。那么他是怎么完成的呢？我们先看下类图，这里我只把这里需要的方法画出来了，其他都省略了
-
+![类图](https://github.com/Iambigsea/Rxjava-2/blob/master/map.png?raw=true)
 对比上篇文章的类图，RxJavaObservableExecutionHook类多了个onLift(lift: Operator<? extends R, ? super T>): Operator<? extends R, ? super T> Observable.create(new Observable.OnSubscribe<String>()就不看了，上篇文章看过，就是创建个observable然后把onsubscribe对象设置成它的成员变量
 onSubscribe,然后后面调用的方法就是map(new Func1<String, Integer>()，同样，点进去看看
 
@@ -189,5 +189,9 @@ onSubscribe,然后后面调用的方法就是map(new Func1<String, Integer>()，
 		    }
 		});
 		
-就是先通过OperatorMap创建一个新的Subscriber，这个Subscriber负责把原始数据String转换为我们需要的Integer,接着调用st.onStart()，再接着调用一开始在create里面创建的参数对象OnSubscribe的call方法，设置call(st)的st为我们负责转换数据的Subscriber，Subscriber接受到原始参数后，再转换成目标参数，再传递到最后的subscribe(new Subscriber<Integer>()的方法onNext(Integer integer)里面
+就是先通过OperatorMap创建一个新的Subscriber，这个Subscriber负责把原始数据String转换为我们需要的Integer,接着调用st.onStart()，再接着调用一开始在create里面创建的参数对象OnSubscribe的call方法，设置call(st)的st为我们负责转换数据的Subscriber，Subscriber接受到原始参数后，再转换成目标参数，再传递到最后的subscribe(new Subscriber<Integer>()的方法onNext(Integer integer)里面，
+下面看下这个流程图就应该更清楚了
+
+
+o了，flatmap见
 
