@@ -80,13 +80,13 @@ onSubscribe,然后后面调用的方法就是map(new Func1<String, Integer>()，
 
 这个类就是把
 
-  map(new Func1<String, Integer>() {
-            @Override
-            public Integer call(String s) {
-                return s.hashCode();
-            }
-        }
-        
+	  map(new Func1<String, Integer>() {
+		    @Override
+		    public Integer call(String s) {
+			return s.hashCode();
+		    }
+		}
+
 设置进去，我们主要关注public Subscriber<? super T> call(final Subscriber<? super R> o)，那么这个o是哪个Subscriber呢，这里暂时不知道,就先不纠结了，看看return new Subscriber<T>(o）的对象，它在onNext方法里面调用参数o的onNext方法，参数接收的transformer.call(t)。这个transformer就是new Func1<String, Integer>，它的call方法就是把接收到的String转为.subscribe(new Subscriber<Integer>()接收到参数interge。这里已经很明白了，这个OperatorMap就是个转换器。</br>
 回到方法lift(new OperatorMap<T, R>(func))中，继续点进lift方法里
 
