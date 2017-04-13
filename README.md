@@ -92,7 +92,7 @@ onSubscribe,然后后面调用的方法就是map(new Func1<String, Integer>()，
 设置进去，我们主要关注public Subscriber<? super T> call(final Subscriber<? super R> o)，那么这个o是哪个Subscriber呢，这里暂时不知道,就先不纠结了，看看return new Subscriber<T>(o）的对象，它在onNext方法里面调用参数o的onNext方法，参数接收的transformer.call(t)。这个transformer就是new Func1<String, Integer>，它的call方法就是把接收到的String转为.subscribe(new Subscriber<Integer>()接收到参数interge。这里已经很明白了，这个OperatorMap就是个转换器。</br>
 回到方法lift(new OperatorMap<T, R>(func))中，继续点进lift方法里
 
-              public final <R> Observable<R> lift(final Operator<? extends R, ? super T> operator) {
+        public final <R> Observable<R> lift(final Operator<? extends R, ? super T> operator) {
         return new Observable<R>(new OnSubscribe<R>() {
             @Override
             public void call(Subscriber<? super R> o) {
@@ -113,6 +113,27 @@ onSubscribe,然后后面调用的方法就是map(new Func1<String, Integer>()，
         });
     }
     
-    
+    
+这里重新创建new Observable<R>(new OnSubscribe<R>()，在方法call(Subscriber<? super R> o)里调用hook.onLift(operator).call(o)重新生成</br> Subscriber<? super T> st,点进去看看这个st是什么东东，hook在上一章说过这个hook就是类的RxJavaObservableExecutionHook对象，完整方法onLift为
 
+   public abstract class RxJavaObservableExecutionHook {
+	......
+    public <T, R> Operator<? extends R, ? super T> onLift(final Operator<? extends R, ? super T> lift) {
+        return lift;
+    }
+  }
+
+好吧，还是和之前一样，什么都没干，直接把传进来的lift返回了，就是说这个Subscriber<? super T> st是operator.call(o)返回的，也就是我们刚刚说的，然后st.onStart()；这个就是调用st的模版方法，没什么好说的
+来看看这个onSubscribe.call(st);这个onSubscribe是什么？其实就是我们一开始在
+
+          Observable.create(new Observable.OnSubscribe<String>() {
+            @Override
+            public void call(Subscriber<? super String> subscriber) {
+                subscriber.onNext("llalala");
+                subscriber.onNext("asdfasda");
+                subscriber.onCompleted();
+            }
+        }
+
+创建的的OnSubscribe对象，它的call方法，就是把String字符串传传到参数Subscriber<? super String> subscriber上，那么这个public void call(Subscriber<? super R> o)
 
